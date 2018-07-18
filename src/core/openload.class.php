@@ -185,15 +185,23 @@ class OpenLoad {
 
 	/**
 	 * Gets a map icon from GameTrackers maps database.
+	 * User-Agent header is changed during request.
 	 * @return string
 	 */
 	public function get_map_icon() {
 		if(ini_get("allow_url_fopen") == 1) {
+			$context = stream_context_create(
+			    array(
+				"http" => array(
+				    "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+				)
+			    )
+			);
 			$buildurl = "http://image.www.gametracker.com/images/maps/160x120/garrysmod/$this->mapname.jpg";
 			$headers = get_headers($buildurl);
 			$headers = substr($headers[0], 9, 3);
 			if($headers != "404") {
-				if(file_get_contents($buildurl) === false) {
+				if(file_get_contents($buildurl, false, $context) === false) {
 					return "https://raw.githubusercontent.com/Svenskunganka/OpenLoad/master/templates/strapquery/img/unknown_map.jpg";
 				}
 				else {
